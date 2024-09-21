@@ -110,7 +110,6 @@ class ShopZoneUsersViewSet(ModelViewSet):
         query = super().get_queryset()
         user = self.request.user
         if user.is_authenticated:
-            print(dir(user))
             return query if user.shopzoneuser.user_type == "admin" else query.filter(owner=user)
         return query.none()
 
