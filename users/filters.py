@@ -8,7 +8,6 @@ class UserFilter(filters.FilterSet):
         fields = ['id', 'email']
 
 
-
 class ShopZoneUserFilter(filters.FilterSet):
     class Meta:
         model = ShopZoneUser
