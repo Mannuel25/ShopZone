@@ -65,16 +65,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ShopZoneUserSerializer(serializers.ModelSerializer):
-    user_info = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
 
-    def get_euser_info(self, obj):
-        # returns the user_info
-        info = {
-            "first_name" : obj.owner.first_name,
-            "last_name" : obj.owner.last_name,
-            "email_address" : obj.owner.email_address,
-        }
-        return info
+    def get_email(self, obj):
+        # returns the user's email address
+        return obj.owner.email
 
     class Meta:
         model = ShopZoneUser
