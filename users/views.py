@@ -101,15 +101,29 @@ class LogoutView(APIView):
         return CustomResponse.success(message="Logout successful")
 
 
+class ShopZoneUsersViewSet(ModelViewSet):
+    queryset = ShopZoneUser.objects.all()
+    serializer_class = ShopZoneUserSerializer
+    filterset_class = ShopZoneUserFilter
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        user = self.request.user
+        if user.is_authenticated:
+            print(dir(user))
+            return query if user.shopzoneuser.user_type == "admin" else query.filter(owner=user)
+        return query.none()
+
+
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filterset_class = UserFilter
 
-
-class ShopZoneUsersViewSet(ModelViewSet):
-    queryset = ShopZoneUser.objects.all()
-    serializer_class = ShopZoneUserSerializer
-    permission_classes = [permissions.AllowAny]
-    filterset_class = ShopZoneUserFilter
+    def get_queryset(self):
+        query = super().get_queryset()
+        user = self.request.user
+        if user.is_authenticated:
+            return query if user.shopzoneuser.user_type == "admin" else query.filter(id=user.id)
+        return query.none()
 
