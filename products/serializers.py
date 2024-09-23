@@ -31,19 +31,37 @@ class StoreSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    store = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
+    store_details = serializers.SerializerMethodField(read_only=True)
+    category_details = serializers.SerializerMethodField(read_only=True)
+    converted_price = serializers.SerializerMethodField()
 
-    def get_store(self, obj):
-        # return the store details
-        try: return StoreSerializer(obj.store).data
+    def get_converted_price(self, obj):
+        return getattr(obj, 'converted_price', obj.price)
+
+    def get_store_details(self, obj):
+        # returns the store details
+        try:
+            data = {
+                "owner_details" : {
+                    "email" : obj.store.owner.email,
+                    "username" : obj.store.owner.username
+                },
+                "name" : obj.store.name,
+                "description" : obj.store.description,
+                "address" : obj.store.address
+            }
+            return data
         except: return {}
 
-    def get_category(self, obj):
-        # return the category details
-        try: return CategorySerializer(obj.category).data
+    def get_category_details(self, obj):
+        # returns the category details
+        try:
+            data = {
+                "name" : obj.category.name,
+                "description" : obj.category.description,
+            }
+            return data
         except: return {}
-
 
     class Meta:
         model = Product
