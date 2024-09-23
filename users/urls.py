@@ -7,8 +7,7 @@ router = DefaultRouter()
 
 app_name = "user_mgt"
 
-router.register('users', ShopZoneUsersViewSet, basename='users')
-router.register('app_users', UserViewSet, basename='app_users')
+router.register('users', UserViewSet, basename='users')
 
 
 urlpatterns = [

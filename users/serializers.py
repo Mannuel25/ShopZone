@@ -63,14 +63,3 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
         read_only_fields = ['date_joined', 'groups', 'user_permissions', 'last_login', 'is_active', 'is_superuser']
 
-
-class ShopZoneUserSerializer(serializers.ModelSerializer):
-    email = serializers.SerializerMethodField()
-
-    def get_email(self, obj):
-        # returns the user's email address
-        return obj.owner.email
-
-    class Meta:
-        model = ShopZoneUser
-        fields = '__all__'

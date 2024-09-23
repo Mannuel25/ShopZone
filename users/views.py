@@ -27,8 +27,7 @@ class LoginView(GenericAPIView):
             refresh = RefreshToken.for_user(self.user)
             login(request, self.user)
             # get the user details of the logged in user
-            user = ShopZoneUser.objects.filter(owner=self.user)
-            user_info = ShopZoneUserSerializer(user.first()).data if user.exists() else []
+            user_info = UserSerializer(self.user).data if self.user else []
             return Response({
                 "success": True,
                 "refresh": str(refresh),
@@ -58,20 +57,15 @@ class SignupView(GenericAPIView):
 
                 # check if a user with the username exists
                 username = self.serializer.validated_data.get('username').lower()
-                if ShopZoneUser.objects.filter(username=username).exists():
+                if User.objects.filter(username=username).exists():
                     raise Exception("A user with this username already exists")
 
                 # create the user account
                 password = self.serializer.validated_data.get('password')
                 user_type = self.serializer.validated_data.get('user_type')
-                user = User.objects.create_user(email=email, password=password)
-                user_data = {
-                    'owner': user,
-                    'username': username,
-                    'user_type' : user_type
-                }
-                shopzone_user = ShopZoneUser.objects.create(**user_data)
-                user_info = ShopZoneUserSerializer(shopzone_user).data
+                user = User.objects.create_user(email=email, password=password, 
+                    user_type=user_type, username=username)
+                user_info = UserSerializer(user).data
                 return CustomResponse.success(data=user_info, message="Registration successful",
                     status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -101,19 +95,6 @@ class LogoutView(APIView):
         return CustomResponse.success(message="Logout successful")
 
 
-class ShopZoneUsersViewSet(ModelViewSet):
-    queryset = ShopZoneUser.objects.all()
-    serializer_class = ShopZoneUserSerializer
-    filterset_class = ShopZoneUserFilter
-
-    def get_queryset(self):
-        query = super().get_queryset()
-        user = self.request.user
-        if user.is_authenticated:
-            return query if user.shopzoneuser.user_type == "admin" else query.filter(owner=user)
-        return query.none()
-
-
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -123,6 +104,6 @@ class UserViewSet(ModelViewSet):
         query = super().get_queryset()
         user = self.request.user
         if user.is_authenticated:
-            return query if user.shopzoneuser.user_type == "admin" else query.filter(id=user.id)
+            return query if user.user_type == "admin" or user.is_superuser else query.filter(id=user.id)
         return query.none()
 

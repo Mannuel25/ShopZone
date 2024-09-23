@@ -5,11 +5,5 @@ from .models import *
 class UserFilter(filters.FilterSet):
     class Meta:
         model = User
-        fields = ['id', 'email']
-
-
-class ShopZoneUserFilter(filters.FilterSet):
-    class Meta:
-        model = ShopZoneUser
-        fields = ['owner', 'username', 'user_type']
+        fields = ['id', 'email', 'user_type', 'username']
 

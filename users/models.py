@@ -7,54 +7,65 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 
 class UserProfileManager(BaseUserManager):
-    def create_user(self, email=None, password=None, **extra_fields):
+    def create_user(self, email=None, username=None, password=None, **extra_fields):
         if not email:
-            raise ValueError("Kindly enter an email address for this user.")
+            raise ValueError("The Email field is required.")
+        if not username:
+            raise ValueError("The Username field is required.")
 
-        # create the user, using the given email and password
+        # Normalize the email and username
+        email = self.normalize_email(email.lower())
+        username = username.lower()
+
+        # Create the user with email, username, and password
         user = self.model(
-            email=self.normalize_email(email.lower()),
-            username=self.normalize_email(email.lower()),
+            email=email,
+            username=username,
             **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email=None, password=None, **extra_fields):
-        if password is None:
-            raise ValueError("Kindly enter a valid password for this superuser.")
+    def create_superuser(self, email=None, username=None, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field is required.")
+        if not username:
+            raise ValueError("The Username field is required.")
+        if not password:
+            raise ValueError("The password field is required.")
 
-        # create the superuser, using the given email and password
-        user = self.create_user(email, password)
-        user.is_superuser, user.is_staff = True, True
-        user.save()
+        # Normalize the email
+        email = self.normalize_email(email.lower())
+
+        # Create the superuser
+        user = self.create_user(
+            email=email,
+            username=username,
+            password=password,
+            **extra_fields
+        )
+        user.is_superuser = user.is_staff = user.is_active = True
+        user.save(using=self._db)
         return user
 
 
 class User(AbstractUser, PermissionsMixin):
+    user_type_options = (
+        ('user', 'User'),
+        ('admin', 'Admin'),
+    )
+    user_type = models.CharField('User Type', choices=user_type_options, max_length=255, default='user')
+    username = models.CharField('username', unique=True, db_index=True)
     email = models.EmailField('email address', unique=True, db_index=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     objects = UserProfileManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'username'  # Make sure username is used as the primary identifier
+    REQUIRED_FIELDS = ['email']  # Email is now a required field when creating a superuser
 
-
-class ShopZoneUser(models.Model):
-    user_type_options= (
-        ('user', 'User'),
-        ('admin', 'Admin'),
-    )
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    username = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    user_type = models.CharField('User Type', choices=user_type_options, max_length=255, default='user')
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.username
+    class Meta:
+        ordering = ('-id',)
 
