@@ -53,6 +53,7 @@ class ProductFilter(filters.FilterSet):
     def get_conversion_rate(self, currency_code, amount):
         """Fetch the conversion rate from NGN to the target currency."""
         try:
+            # generate your API_KEY here..
             API_KEY = config("API_KEY")
             url = f'https://v6.exchangerate-api.com/v6/{API_KEY}/pair/NGN/{currency_code}/{amount}'
             response = requests.get(url)
