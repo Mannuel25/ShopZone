@@ -126,8 +126,8 @@ Built with **Django**, **Django REST Framework**, and **PostgreSQL**, the platfo
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/Mannuel25/shopzone.git
-   cd shopzone
+   git clone https://github.com/Mannuel25/ShopZone.git
+   cd ShopZone
    ```
 
 2. **Ensure Docker is installed**
@@ -193,7 +193,7 @@ Built with **Django**, **Django REST Framework**, and **PostgreSQL**, the platfo
 ## API Documentation 📖
 
 Explore the API using the Postman collection [here](https://www.postman.com/lunar-rocket-946206/workspace/shopzone/collection/20593383-4e119c8d-ade5-4eeb-881c-0de7231f9da5?action=share&creator=20593383) for testing and interacting with the API endpoints.
-Alternatively, you can interacte with the documentation available at `/swagger/` or `/redoc/` endpoints when running the server.
+Alternatively, you can interact with the documentation available at `/swagger/` or `/redoc/` endpoints when running the server.
 
 
 ---
@@ -229,5 +229,5 @@ Errors are returned in the following format:
 
 ## License 📜
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under an  [MIT LICENSE](LICENSE).
 
